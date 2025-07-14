@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Smart Car Showroom{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </h1>
+        <p class="text-muted">Welcome to CARZEO Management System</p>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card">
+            <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-white-50 text-uppercase mb-1">
+                        Total Cars
+                    </div>
+                    <div class="h5 mb-0 font-weight-bold text-white">{{ total_cars }}</div>
+                </div>
+                <div class="col-auto">
+                    <i class="fas fa-car fa-2x text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card success">
+            <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-white-50 text-uppercase mb-1">
+                        Available Cars
+                    </div>
+                    <div class="h5 mb-0 font-weight-bold text-white">{{ available_cars }}</div>
+                </div>
+                <div class="col-auto">
+                    <i class="fas fa-check-circle fa-2x text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card info">
+            <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-white-50 text-uppercase mb-1">
+                        Total Sales
+                    </div>
+                    <div class="h5 mb-0 font-weight-bold text-white">{{ total_sales }}</div>
+                </div>
+                <div class="col-auto">
+                    <i class="fas fa-shopping-cart fa-2x text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card warning">
+            <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-white-50 text-uppercase mb-1">
+                        Total Customers
+                    </div>
+                    <div class="h5 mb-0 font-weight-bold text-white">{{ total_customers }}</div>
+                </div>
+                <div class="col-auto">
+                    <i class="fas fa-users fa-2x text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row">
+    <!-- Recent Sales -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-shopping-cart"></i> Recent Sales
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if recent_sales %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Car</th>
+                                    <th>Customer</th>
+                                    <th>Salesperson</th>
+                                    <th>Price</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sale, car, customer, salesperson in recent_sales %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ car.brand }} {{ car.model }}</strong><br>
+                                        <small class="text-muted">{{ car.year }} - {{ car.color }}</small>
+                                    </td>
+                                    <td>{{ customer.name }}</td>
+                                    <td>{{ salesperson.name }}</td>
+                                    <td>৳{{ "%.2f"|format(sale.sale_price) }}</td>
+                                    <td>{{ sale.sale_date.strftime('%Y-%m-%d') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">No recent sales</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Bookings -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-calendar-alt"></i> Upcoming Bookings
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if upcoming_bookings %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Car</th>
+                                    <th>Customer</th>
+                                    <th>Date & Time</th>
+                                    <th>Purpose</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking, car, customer in upcoming_bookings %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ car.brand }} {{ car.model }}</strong><br>
+                                        <small class="text-muted">{{ car.year }}</small>
+                                    </td>
+                                    <td>{{ customer.name }}</td>
+                                    <td>
+                                        {{ booking.booking_date.strftime('%Y-%m-%d') }}<br>
+                                        <small class="text-muted">{{ booking.booking_time.strftime('%H:%M') }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ booking.purpose.replace('_', ' ').title() }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge status-{{ booking.status }}">{{ booking.status.title() }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">No upcoming bookings</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-bolt"></i> Quick Actions
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('add_car') }}" class="btn btn-primary btn-block w-100">
+                            <i class="fas fa-plus"></i> Add New Car
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('add_customer') }}" class="btn btn-success btn-block w-100">
+                            <i class="fas fa-user-plus"></i> Add Customer
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('add_sale') }}" class="btn btn-info btn-block w-100">
+                            <i class="fas fa-cart-plus"></i> Record Sale
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('add_booking') }}" class="btn btn-warning btn-block w-100">
+                            <i class="fas fa-calendar-plus"></i> Book Test Drive
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Information -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-info-circle"></i> System Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                                        <h6>CARZEO Database Features:</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Relational Database Design with Foreign Keys</li>
+                    <li><i class="fas fa-check text-success"></i> Triggers for Auto-updating Stock</li>
+                    <li><i class="fas fa-check text-success"></i> Stored Procedures for Booking Validation</li>
+                    <li><i class="fas fa-check text-success"></i> Views for Performance Analysis</li>
+                    <li><i class="fas fa-check text-success"></i> Indexes for Query Optimization</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h6>CARZEO Key Functionalities:</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Vehicle Inventory Management</li>
+                    <li><i class="fas fa-check text-success"></i> Customer Management</li>
+                    <li><i class="fas fa-check text-success"></i> Sales Management</li>
+                    <li><i class="fas fa-check text-success"></i> Booking/Test Drive Management</li>
+                    <li><i class="fas fa-check text-success"></i> Comprehensive Reports</li>
+                </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Sales Report - CARZEO{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-0">
+            <i class="fas fa-chart-line"></i> Sales Report
+        </h1>
+        <p class="text-muted">Comprehensive sales analysis and performance metrics</p>
+    </div>
+    <a href="{{ url_for('reports') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Reports
+    </a>
+</div>
+
+<!-- Monthly Sales Report -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold">
+            <i class="fas fa-calendar-alt"></i> Monthly Sales Report ({{ current_month }}/{{ current_year }})
+        </h6>
+    </div>
+    <div class="card-body">
+        {% if monthly_sales %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Brand</th>
+                            <th>Model</th>
+                            <th>Units Sold</th>
+                            <th>Total Revenue</th>
+                            <th>Average Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in monthly_sales %}
+                        <tr>
+                            <td><strong>{{ sale.brand }}</strong></td>
+                            <td>{{ sale.model }}</td>
+                            <td>
+                                <span class="badge bg-primary">{{ sale.units_sold }}</span>
+                            </td>
+                            <td>
+                                <strong class="text-success">৳{{ "%.2f"|format(sale.total_revenue) }}</strong>
+                            </td>
+                                                            <td>৳{{ "%.2f"|format(sale.avg_price) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No sales data for this month</h5>
+                <p class="text-muted">Sales will appear here once recorded</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Top Selling Models -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold">
+            <i class="fas fa-trophy"></i> Top Selling Models (All Time)
+        </h6>
+    </div>
+    <div class="card-body">
+        {% if top_models %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Brand</th>
+                            <th>Model</th>
+                            <th>Total Sales</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for model in top_models %}
+                        <tr>
+                            <td>
+                                {% if loop.index == 1 %}
+                                    <i class="fas fa-medal text-warning"></i> 1st
+                                {% elif loop.index == 2 %}
+                                    <i class="fas fa-medal text-secondary"></i> 2nd
+                                {% elif loop.index == 3 %}
+                                    <i class="fas fa-medal text-bronze"></i> 3rd
+                                {% else %}
+                                    {{ loop.index }}
+                                {% endif %}
+                            </td>
+                            <td><strong>{{ model.brand }}</strong></td>
+                            <td>{{ model.model }}</td>
+                            <td>
+                                <span class="badge bg-success">{{ model.total_sales }} units</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-trophy fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No sales data available</h5>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Salesperson Performance -->
+<div class="card">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold">
+            <i class="fas fa-user-tie"></i> Salesperson Performance
+        </h6>
+    </div>
+    <div class="card-body">
+        {% if salesperson_performance %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Salesperson</th>
+                            <th>Total Sales</th>
+                            <th>Total Revenue</th>
+                            <th>Total Commission</th>
+                            <th>Performance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for person in salesperson_performance %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-user-tie fa-2x text-primary"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="mb-0">{{ person.name }}</h6>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-info">{{ person.total_sales }} sales</span>
+                            </td>
+                            <td>
+                                <strong class="text-success">৳{{ "%.2f"|format(person.total_revenue) }}</strong>
+                            </td>
+                            <td>
+                                <strong class="text-warning">৳{{ "%.2f"|format(person.total_commission) }}</strong>
+                            </td>
+                            <td>
+                                {% if person.total_sales > 5 %}
+                                    <span class="badge bg-success">Excellent</span>
+                                {% elif person.total_sales > 2 %}
+                                    <span class="badge bg-warning">Good</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Average</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-user-tie fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No salesperson performance data</h5>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

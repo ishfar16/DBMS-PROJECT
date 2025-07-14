@@ -1,0 +1,70 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Bookings - Admin Panel - CARZEO{% endblock %}
+{% block page_title %}Booking Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Test Drive Bookings</h2>
+    <a href="{{ url_for('admin_add_booking') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Create New Booking
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if bookings %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Car</th>
+                        <th>Customer</th>
+                        <th>Date & Time</th>
+                        <th>Purpose</th>
+                        <th>Salesperson</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking, car, customer, salesperson in bookings %}
+                    <tr>
+                        <td>
+                            <strong>{{ car.brand }} {{ car.model }}</strong><br>
+                            <small class="text-muted">{{ car.year }} - {{ car.color }}</small>
+                        </td>
+                        <td>{{ customer.name }}</td>
+                        <td>
+                            {{ booking.booking_date.strftime('%Y-%m-%d') }}<br>
+                            <small class="text-muted">{{ booking.booking_time.strftime('%H:%M') }}</small>
+                        </td>
+                        <td>{{ booking.purpose.replace('_', ' ').title() }}</td>
+                        <td>{{ salesperson.name if salesperson else 'Not Assigned' }}</td>
+                        <td>
+                            <span class="badge bg-{{ 'success' if booking.status == 'confirmed' else 'warning' if booking.status == 'pending' else 'secondary' }}">
+                                {{ booking.status.title() }}
+                            </span>
+                            <a href="{{ url_for('admin_edit_booking', booking_id=booking.booking_id) }}" class="btn btn-sm btn-outline-primary ms-2">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </td>
+                        <td>{{ booking.created_at.strftime('%Y-%m-%d') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="fas fa-calendar-check fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No bookings found</h5>
+            <p class="text-muted">Bookings will appear here once customers book test drives.</p>
+            <a href="{{ url_for('admin_add_booking') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Create First Booking
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

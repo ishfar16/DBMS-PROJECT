@@ -1,0 +1,115 @@
+/* CARZEO Car Catalog Styles */
+
+.car-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.car-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.card-img-top-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px 10px 0 0;
+}
+
+.car-image-placeholder {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+}
+
+.car-image-placeholder i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.car-specs {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.car-specs i {
+    width: 16px;
+    margin-right: 4px;
+}
+
+.price-tag {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #28a745;
+}
+
+.stock-badge {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.stock-badge.in-stock {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.stock-badge.out-of-stock {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Search and Filter Styles */
+.search-filters {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+/* Modal Styles */
+.modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 10px 10px 0 0;
+}
+
+.modal-header .btn-close {
+    filter: invert(1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .car-card {
+        margin-bottom: 20px;
+    }
+    
+    .search-filters .row {
+        margin-bottom: 10px;
+    }
+}
+
+/* Animation for stock updates */
+@keyframes stockUpdate {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.stock-update {
+    animation: stockUpdate 0.5s ease;
+}
+
+/* Brand-specific colors */
+.brand-toyota { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
+.brand-honda { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); }
+.brand-ford { background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); }
+.brand-tesla { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); }
+.brand-bmw { background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); }
+.brand-mercedes { background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%); }
+.brand-audi { background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%); }
+.brand-hyundai { background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); } 

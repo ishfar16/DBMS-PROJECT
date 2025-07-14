@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory Report - CARZEO{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-0">
+            <i class="fas fa-car"></i> Inventory Report
+        </h1>
+        <p class="text-muted">Current inventory status and alerts</p>
+    </div>
+    <a href="{{ url_for('reports') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Reports
+    </a>
+</div>
+
+<!-- Inventory Status -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold">
+            <i class="fas fa-chart-pie"></i> Inventory Status by Brand & Model
+        </h6>
+    </div>
+    <div class="card-body">
+        {% if inventory_status %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Brand</th>
+                            <th>Model</th>
+                            <th>Year</th>
+                            <th>Total Cars</th>
+                            <th>Available</th>
+                            <th>Sold</th>
+                            <th>Average Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in inventory_status %}
+                        <tr>
+                            <td><strong>{{ item.brand }}</strong></td>
+                            <td>{{ item.model }}</td>
+                            <td>{{ item.year }}</td>
+                            <td>
+                                <span class="badge bg-primary">{{ item.total_cars }}</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-success">{{ item.available_cars }}</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-danger">{{ item.sold_cars }}</span>
+                            </td>
+                            <td>
+                                <strong>৳{{ "%.2f"|format(item.avg_price) }}</strong>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-car fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No inventory data available</h5>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Low Stock Alerts -->
+<div class="card">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold">
+            <i class="fas fa-exclamation-triangle"></i> Low Stock Alerts
+        </h6>
+    </div>
+    <div class="card-body">
+        {% if low_stock %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Car</th>
+                            <th>Current Stock</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for car in low_stock %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-car fa-2x text-warning"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="mb-0">{{ car.brand }} {{ car.model }}</h6>
+                                        <small class="text-muted">{{ car.year }} - {{ car.color }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-danger">{{ car.available_stock }} units</span>
+                            </td>
+                            <td>
+                                <strong>৳{{ "%.2f"|format(car.price) }}</strong>
+                            </td>
+                            <td>
+                                <span class="badge status-{{ car.status }}">{{ car.status.title() }}</span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('edit_car', car_id=car.car_id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit"></i> Update Stock
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                <h5 class="text-success">No low stock alerts</h5>
+                <p class="text-muted">All cars have sufficient stock levels</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

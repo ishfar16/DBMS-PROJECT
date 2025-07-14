@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Bookings - CARZEO{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-0">
+            <i class="fas fa-calendar-alt"></i> Bookings
+        </h1>
+        <p class="text-muted">Manage test drives and appointments</p>
+    </div>
+    <a href="{{ url_for('add_booking') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> New Booking
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold">
+            <i class="fas fa-list"></i> All Bookings ({{ bookings|length }})
+        </h6>
+    </div>
+    <div class="card-body">
+        {% if bookings %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Car</th>
+                            <th>Customer</th>
+                            <th>Salesperson</th>
+                            <th>Purpose</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking, car, customer, salesperson in bookings %}
+                        <tr>
+                            <td>
+                                <strong>{{ booking.booking_date.strftime('%Y-%m-%d') }}</strong><br>
+                                <small class="text-muted">{{ booking.booking_time.strftime('%H:%M') }}</small>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-car fa-2x text-primary"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="mb-0">{{ car.brand }} {{ car.model }}</h6>
+                                        <small class="text-muted">{{ car.year }} - {{ car.color }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <strong>{{ customer.name }}</strong><br>
+                                <small class="text-muted">{{ customer.phone }}</small>
+                            </td>
+                            <td>
+                                {% if salesperson %}
+                                    <strong>{{ salesperson.name }}</strong>
+                                {% else %}
+                                    <span class="text-muted">Not assigned</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-info">{{ booking.purpose.replace('_', ' ').title() }}</span>
+                            </td>
+                            <td>
+                                <span class="badge status-{{ booking.status }}">{{ booking.status.title() }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No bookings found</h5>
+                <p class="text-muted">Create your first booking to get started</p>
+                <a href="{{ url_for('add_booking') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> New Booking
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

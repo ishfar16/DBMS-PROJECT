@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+
+{% block title %}Car Catalog - CARZEO{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3 mb-0">
+            <i class="fas fa-car"></i> CARZEO Car Catalog
+        </h1>
+        <p class="text-muted">Browse our available cars and book your test drive</p>
+    </div>
+</div>
+
+<!-- Search and Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form id="searchForm" class="row g-3">
+            <div class="col-md-3">
+                <label for="brand" class="form-label">Brand</label>
+                <select class="form-select" id="brand" name="brand">
+                    <option value="">All Brands</option>
+                    <option value="Toyota">Toyota</option>
+                    <option value="Honda">Honda</option>
+                    <option value="Ford">Ford</option>
+                    <option value="Tesla">Tesla</option>
+                    <option value="BMW">BMW</option>
+                    <option value="Mercedes">Mercedes</option>
+                    <option value="Audi">Audi</option>
+                    <option value="Hyundai">Hyundai</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="fuel_type" class="form-label">Fuel Type</label>
+                <select class="form-select" id="fuel_type" name="fuel_type">
+                    <option value="">All Types</option>
+                    <option value="Petrol">Petrol</option>
+                    <option value="Diesel">Diesel</option>
+                    <option value="Electric">Electric</option>
+                    <option value="Hybrid">Hybrid</option>
+                    <option value="CNG">CNG</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="min_price" class="form-label">Min Price</label>
+                <input type="number" class="form-control" id="min_price" name="min_price" placeholder="Min">
+            </div>
+            <div class="col-md-2">
+                <label for="max_price" class="form-label">Max Price</label>
+                <input type="number" class="form-control" id="max_price" name="max_price" placeholder="Max">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Cars Grid -->
+<div class="row" id="carsGrid">
+    {% for car in cars %}
+    <div class="col-lg-4 col-md-6 mb-4 car-card" data-brand="{{ car.brand }}" data-fuel="{{ car.fuel_type }}" data-price="{{ car.price }}">
+        <div class="card h-100">
+            <!-- Car Image -->
+            <div class="card-img-top-container car-image-placeholder brand-{{ car.brand.lower() }}">
+                <div class="text-center text-white">
+                    <i class="fas fa-car fa-4x mb-2"></i>
+                    <h5>{{ car.brand }} {{ car.model }}</h5>
+                    <p class="mb-0">{{ car.year }} - {{ car.color }}</p>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <h5 class="card-title">{{ car.brand }} {{ car.model }}</h5>
+                <p class="card-text text-muted">{{ car.year }} • {{ car.color }} • {{ car.fuel_type }}</p>
+                
+                <!-- Specifications -->
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <small class="text-muted">
+                            <i class="fas fa-cog"></i> {{ car.transmission }}<br>
+                            {% if car.engine_capacity %}
+                                <i class="fas fa-tachometer-alt"></i> {{ car.engine_capacity }}L
+                            {% endif %}
+                        </small>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted">
+                            {% if car.mileage %}
+                                <i class="fas fa-road"></i> {{ "%.0f"|format(car.mileage) }} km<br>
+                            {% endif %}
+                            <i class="fas fa-gas-pump"></i> {{ car.fuel_type }}
+                        </small>
+                    </div>
+                </div>
+                
+                <!-- Price and Stock -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h4 class="price-tag">৳{{ "%.2f"|format(car.price) }}</h4>
+                    <div>
+                        {% if car.available_stock > 0 %}
+                            <span class="stock-badge in-stock">
+                                <i class="fas fa-check"></i> In Stock ({{ car.available_stock }})
+                            </span>
+                        {% else %}
+                            <span class="stock-badge out-of-stock">
+                                <i class="fas fa-times"></i> Out of Stock
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-grid gap-2">
+                    {% if car.available_stock > 0 %}
+                        <button class="btn btn-primary" onclick="bookCar({{ car.car_id }}, '{{ car.brand }} {{ car.model }}')">
+                            <i class="fas fa-calendar-plus"></i> Book Test Drive
+                        </button>
+                    {% else %}
+                        <button class="btn btn-secondary" disabled>
+                            <i class="fas fa-ban"></i> Not Available
+                        </button>
+                    {% endif %}
+                    <button class="btn btn-outline-info" onclick="viewDetails({{ car.car_id }})">
+                        <i class="fas fa-info-circle"></i> View Details
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- No Cars Message -->
+<div id="noCarsMessage" class="text-center py-5" style="display: none;">
+    <i class="fas fa-car fa-3x text-muted mb-3"></i>
+    <h5 class="text-muted">No cars found</h5>
+    <p class="text-muted">Try adjusting your search criteria</p>
+</div>
+
+<!-- Booking Modal -->
+<div class="modal fade" id="bookingModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Book Test Drive</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="bookingForm">
+                    <input type="hidden" id="bookingCarId" name="car_id">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Selected Car</label>
+                        <p class="form-control-plaintext" id="selectedCarName"></p>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="customerName" class="form-label">Your Name *</label>
+                            <input type="text" class="form-control" id="customerName" name="name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="customerPhone" class="form-label">Phone Number *</label>
+                            <input type="tel" class="form-control" id="customerPhone" name="phone" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="customerEmail" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="customerEmail" name="email">
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="bookingDate" class="form-label">Preferred Date *</label>
+                            <input type="date" class="form-control" id="bookingDate" name="booking_date" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="bookingTime" class="form-label">Preferred Time *</label>
+                            <input type="time" class="form-control" id="bookingTime" name="booking_time" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="bookingNotes" class="form-label">Additional Notes</label>
+                        <textarea class="form-control" id="bookingNotes" name="notes" rows="3" placeholder="Any special requirements or questions"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitBooking()">
+                    <i class="fas fa-calendar-check"></i> Confirm Booking
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Car Details Modal -->
+<div class="modal fade" id="carDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Car Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="carDetailsContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Set minimum date to today
+document.getElementById('bookingDate').min = new Date().toISOString().split('T')[0];
+
+function bookCar(carId, carName) {
+    document.getElementById('bookingCarId').value = carId;
+    document.getElementById('selectedCarName').textContent = carName;
+    new bootstrap.Modal(document.getElementById('bookingModal')).show();
+}
+
+function viewDetails(carId) {
+    // Load car details via AJAX
+    fetch(`/api/cars/${carId}`)
+        .then(response => response.json())
+        .then(car => {
+            const content = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="text-center mb-3">
+                            <div style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; border-radius: 10px;">
+                                <div class="text-white">
+                                    <i class="fas fa-car fa-4x mb-2"></i>
+                                    <h4>${car.brand} ${car.model}</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h4>${car.brand} ${car.model}</h4>
+                        <p class="text-muted">${car.year} • ${car.color}</p>
+                        
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <strong>Price:</strong><br>
+                                <span class="text-success h5">৳${parseFloat(car.price).toFixed(2)}</span>
+                            </div>
+                            <div class="col-6">
+                                <strong>Stock:</strong><br>
+                                ${car.available_stock > 0 ? 
+                                    `<span class="badge bg-success">In Stock (${car.available_stock})</span>` : 
+                                    `<span class="badge bg-danger">Out of Stock</span>`
+                                }
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <strong>Fuel Type:</strong><br>
+                                ${car.fuel_type}
+                            </div>
+                            <div class="col-6">
+                                <strong>Transmission:</strong><br>
+                                ${car.transmission}
+                            </div>
+                        </div>
+                        
+                        ${car.engine_capacity ? `
+                        <div class="row mt-2">
+                            <div class="col-6">
+                                <strong>Engine:</strong><br>
+                                ${car.engine_capacity}L
+                            </div>
+                            <div class="col-6">
+                                <strong>Mileage:</strong><br>
+                                ${car.mileage ? parseFloat(car.mileage).toFixed(0) + ' km' : 'N/A'}
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        ${car.description ? `
+                        <div class="mt-3">
+                            <strong>Description:</strong><br>
+                            <p class="text-muted">${car.description}</p>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            document.getElementById('carDetailsContent').innerHTML = content;
+            new bootstrap.Modal(document.getElementById('carDetailsModal')).show();
+        })
+        .catch(error => {
+            console.error('Error loading car details:', error);
+            alert('Error loading car details');
+        });
+}
+
+function submitBooking() {
+    const form = document.getElementById('bookingForm');
+    const formData = new FormData(form);
+    
+    fetch('/api/bookings/create', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Booking submitted successfully! We will contact you soon.');
+            bootstrap.Modal.getInstance(document.getElementById('bookingModal')).hide();
+            form.reset();
+            // Refresh the page to update stock
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error submitting booking:', error);
+        alert('Error submitting booking. Please try again.');
+    });
+}
+
+// Search and filter functionality
+document.getElementById('searchForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const brand = document.getElementById('brand').value;
+    const fuelType = document.getElementById('fuel_type').value;
+    const minPrice = document.getElementById('min_price').value;
+    const maxPrice = document.getElementById('max_price').value;
+    
+    const cards = document.querySelectorAll('.car-card');
+    let visibleCount = 0;
+    
+    cards.forEach(card => {
+        const cardBrand = card.dataset.brand;
+        const cardFuel = card.dataset.fuel;
+        const cardPrice = parseFloat(card.dataset.price);
+        
+        let show = true;
+        
+        if (brand && cardBrand !== brand) show = false;
+        if (fuelType && cardFuel !== fuelType) show = false;
+        if (minPrice && cardPrice < parseFloat(minPrice)) show = false;
+        if (maxPrice && cardPrice > parseFloat(maxPrice)) show = false;
+        
+        card.style.display = show ? 'block' : 'none';
+        if (show) visibleCount++;
+    });
+    
+    const noCarsMessage = document.getElementById('noCarsMessage');
+    if (visibleCount === 0) {
+        noCarsMessage.style.display = 'block';
+    } else {
+        noCarsMessage.style.display = 'none';
+    }
+});
+</script>
+{% endblock %} 

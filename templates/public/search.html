@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - CARZEO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+        }
+        .car-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+        }
+        .car-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        .car-image {
+            height: 250px;
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px 15px 0 0;
+            overflow: hidden;
+        }
+        .car-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .car-image:hover img {
+            transform: scale(1.05);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .stock-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{{ url_for('home') }}">
+                <i class="fas fa-car me-2"></i>CARZEO
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('home') }}#catalog">Car Catalog</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('home') }}#search">Search Cars</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('home') }}#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('home') }}#contact">Contact</a>
+                    </li>
+                </ul>
+                
+                <div class="navbar-nav">
+                    {% if session.get('customer_logged_in') %}
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-1"></i>{{ session.get('customer_name', 'Customer') }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('customer_dashboard') }}">
+                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                                </a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('customer_profile') }}">
+                                    <i class="fas fa-user me-2"></i>Profile
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('customer_logout') }}">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                </a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a class="nav-link" href="{{ url_for('customer_login') }}">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login
+                        </a>
+                        <a class="nav-link" href="{{ url_for('customer_register') }}">
+                            <i class="fas fa-user-plus me-1"></i>Register
+                        </a>
+                    {% endif %}
+                    <a class="nav-link" href="{{ url_for('admin_login') }}">
+                        <i class="fas fa-cog me-1"></i>Admin
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Search Results Section -->
+    <section class="py-5" style="margin-top: 80px;">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h2>Search Results</h2>
+                    <p class="text-muted">
+                        {% if brand or model or min_price or max_price or availability %}
+                            Showing results for:
+                            {% if brand %}<span class="badge bg-primary me-1">Brand: {{ brand }}</span>{% endif %}
+                            {% if model %}<span class="badge bg-primary me-1">Model: {{ model }}</span>{% endif %}
+                            {% if min_price %}<span class="badge bg-primary me-1">Min Price: ৳{{ min_price }}</span>{% endif %}
+                            {% if max_price %}<span class="badge bg-primary me-1">Max Price: ৳{{ max_price }}</span>{% endif %}
+                            {% if availability %}<span class="badge bg-primary me-1">Availability: {{ availability.replace('_', ' ').title() }}</span>{% endif %}
+                        {% else %}
+                            All available cars
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            
+            {% if cars %}
+            <div class="row">
+                {% for car in cars %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card car-card">
+                        <div class="car-image">
+                            {% if car.image_url %}
+                                <img src="{{ url_for('static', filename=car.image_url) }}" alt="{{ car.brand }} {{ car.model }}">
+                            {% else %}
+                                <i class="fas fa-car fa-4x text-muted"></i>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Stock Badge -->
+                        {% if car.available_stock > 0 %}
+                            <span class="badge bg-success stock-badge">
+                                <i class="fas fa-check me-1"></i>In Stock ({{ car.available_stock }})
+                            </span>
+                        {% else %}
+                            <span class="badge bg-danger stock-badge">
+                                <i class="fas fa-times me-1"></i>Out of Stock
+                            </span>
+                        {% endif %}
+                        
+                        <div class="card-body">
+                            <h5 class="card-title">{{ car.brand }} {{ car.model }}</h5>
+                            <p class="card-text text-muted">{{ car.year }} • {{ car.color }}</p>
+                            
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <small class="text-muted">Fuel Type</small><br>
+                                    <strong>{{ car.fuel_type.title() }}</strong>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">Transmission</small><br>
+                                    <strong>{{ car.transmission.title() }}</strong>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="h5 text-primary mb-0">৳{{ "%.2f"|format(car.price) }}</span>
+                                {% if car.available_stock > 0 %}
+                                    <button class="btn btn-primary btn-sm" onclick="bookCar({{ car.car_id }})">
+                                        <i class="fas fa-calendar-plus me-1"></i>Book Test Drive
+                                    </button>
+                                {% else %}
+                                    <button class="btn btn-secondary btn-sm" disabled>
+                                        <i class="fas fa-times me-1"></i>Not Available
+                                    </button>
+                                {% endif %}
+                            </div>
+                            
+                            <button class="btn btn-outline-primary btn-sm w-100" onclick="viewCarDetails({{ car.car_id }})">
+                                <i class="fas fa-info-circle me-1"></i>View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No cars found</h4>
+                <p class="text-muted">Try adjusting your search criteria or browse all available cars.</p>
+                <a href="{{ url_for('home') }}" class="btn btn-primary">
+                    <i class="fas fa-car me-2"></i>Browse All Cars
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Car Details Modal -->
+    <div class="modal fade" id="carDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Car Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="carDetailsContent">
+                    <!-- Content will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal fade" id="bookingModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Book Test Drive</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    {% if session.get('customer_logged_in') %}
+                    <form id="bookingForm">
+                        <input type="hidden" id="bookingCarId" name="car_id">
+                        <div class="mb-3">
+                            <label for="bookingDate" class="form-label">Preferred Date</label>
+                            <input type="date" class="form-control" id="bookingDate" name="booking_date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="bookingTime" class="form-label">Preferred Time</label>
+                            <input type="time" class="form-control" id="bookingTime" name="booking_time" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="bookingNotes" class="form-label">Additional Notes</label>
+                            <textarea class="form-control" id="bookingNotes" name="notes" rows="3"></textarea>
+                        </div>
+                    </form>
+                    {% else %}
+                    <div class="text-center">
+                        <i class="fas fa-lock fa-3x text-muted mb-3"></i>
+                        <h5>Login Required</h5>
+                        <p>Please login or register to book a test drive.</p>
+                        <a href="{{ url_for('customer_login') }}" class="btn btn-primary me-2">Login</a>
+                        <a href="{{ url_for('customer_register') }}" class="btn btn-outline-primary">Register</a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% if session.get('customer_logged_in') %}
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitBooking()">
+                        <i class="fas fa-calendar-plus me-1"></i>Book Test Drive
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Set minimum date to today
+        document.getElementById('bookingDate').min = new Date().toISOString().split('T')[0];
+
+        function viewCarDetails(carId) {
+            fetch(`/api/cars/${carId}`)
+                .then(response => response.json())
+                .then(car => {
+                    const content = `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="car-image mb-3">
+                                    ${car.image_url ? `<img src="/static/${car.image_url}" alt="${car.brand} ${car.model}" class="img-fluid">` : '<i class="fas fa-car fa-4x text-muted"></i>'}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h4>${car.brand} ${car.model}</h4>
+                                <p class="text-muted">${car.year} • ${car.color}</p>
+                                <h5 class="text-primary">৳${car.price.toFixed(2)}</h5>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <strong>Fuel Type:</strong><br>
+                                        <span class="text-muted">${car.fuel_type}</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Transmission:</strong><br>
+                                        <span class="text-muted">${car.transmission}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <strong>Engine:</strong><br>
+                                        <span class="text-muted">${car.engine_capacity || 'N/A'}L</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Mileage:</strong><br>
+                                        <span class="text-muted">${car.mileage || 'N/A'} km</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <strong>Stock:</strong><br>
+                                    <span class="badge bg-${car.available_stock > 0 ? 'success' : 'danger'}">
+                                        ${car.available_stock > 0 ? `In Stock (${car.available_stock})` : 'Out of Stock'}
+                                    </span>
+                                </div>
+                                
+                                ${car.description ? `<p><strong>Description:</strong><br>${car.description}</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('carDetailsContent').innerHTML = content;
+                    new bootstrap.Modal(document.getElementById('carDetailsModal')).show();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error loading car details');
+                });
+        }
+
+        function bookCar(carId) {
+            {% if session.get('customer_logged_in') %}
+                document.getElementById('bookingCarId').value = carId;
+                new bootstrap.Modal(document.getElementById('bookingModal')).show();
+            {% else %}
+                window.location.href = "{{ url_for('customer_login') }}";
+            {% endif %}
+        }
+
+        function submitBooking() {
+            const formData = new FormData(document.getElementById('bookingForm'));
+            
+            fetch('/api/bookings/create', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Booking created successfully!');
+                    bootstrap.Modal.getInstance(document.getElementById('bookingModal')).hide();
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error creating booking');
+            });
+        }
+    </script>
+</body>
+</html> 
