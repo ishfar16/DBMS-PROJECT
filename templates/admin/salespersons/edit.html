@@ -1,0 +1,126 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Edit Salesperson - CARZEO{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-0">
+            <i class="fas fa-user-edit"></i> Edit Salesperson
+        </h1>
+        <p class="text-muted">Update salesperson information</p>
+    </div>
+    <a href="{{ url_for('admin_salespersons') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Salespersons
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-edit"></i> Salesperson Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">Full Name *</label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="{{ salesperson.name }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="contact" class="form-label">Contact Number *</label>
+                            <input type="tel" class="form-control" id="contact" name="contact" 
+                                   value="{{ salesperson.contact }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email Address *</label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="{{ salesperson.email }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="hire_date" class="form-label">Hire Date</label>
+                            <input type="date" class="form-control" id="hire_date" name="hire_date" 
+                                   value="{{ salesperson.hire_date.strftime('%Y-%m-%d') }}">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="commission_rate" class="form-label">Commission Rate (%) *</label>
+                            <input type="number" class="form-control" id="commission_rate" name="commission_rate" 
+                                   step="0.01" min="0" max="100" value="{{ "%.2f"|format(salesperson.commission_rate) }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="status" class="form-label">Status *</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="active" {% if salesperson.status == 'active' %}selected{% endif %}>Active</option>
+                                <option value="inactive" {% if salesperson.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('admin_salespersons') }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update Salesperson
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-info-circle"></i> Salesperson Details
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-user-tie fa-2x text-primary me-3"></i>
+                    <div>
+                        <h6 class="mb-0">{{ salesperson.name }}</h6>
+                        <small class="text-muted">ID: {{ salesperson.employee_id }}</small>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Contact:</strong><br>
+                    <small>{{ salesperson.contact }}</small><br>
+                    <small>{{ salesperson.email }}</small>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Hire Date:</strong><br>
+                    <small>{{ salesperson.hire_date.strftime('%B %d, %Y') }}</small>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Commission Rate:</strong><br>
+                    <span class="badge bg-warning">{{ "%.2f"|format(salesperson.commission_rate) }}%</span>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Status:</strong><br>
+                    {% if salesperson.status == 'active' %}
+                        <span class="badge bg-success">Active</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Inactive</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

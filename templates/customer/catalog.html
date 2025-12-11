@@ -1,0 +1,212 @@
+{% extends "customer/base.html" %}
+
+{% block title %}Car Catalog - CARZEO{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-0">
+            <i class="fas fa-car"></i> Car Catalog
+        </h1>
+        <p class="text-muted">Browse our available vehicles</p>
+    </div>
+    <div>
+        <a href="{{ url_for('search_cars') }}" class="btn btn-outline-primary me-2">
+            <i class="fas fa-search"></i> Search Cars
+        </a>
+        <a href="{{ url_for('customer_dashboard') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+{% if cars %}
+    <div class="row">
+        {% for car in cars %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                {% if car.image_url %}
+                <img src="{{ url_for('static', filename=car.image_url) }}" 
+                     class="card-img-top" alt="{{ car.brand }} {{ car.model }}"
+                     style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                     style="height: 200px;">
+                    <i class="fas fa-car fa-3x text-muted"></i>
+                </div>
+                {% endif %}
+                
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title mb-0">{{ car.brand }} {{ car.model }}</h5>
+                        <span class="badge bg-success">{{ car.year }}</span>
+                    </div>
+                    
+                    <p class="text-muted mb-3">{{ car.color }} • {{ car.fuel_type }} • {{ car.transmission }}</p>
+                    
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <small class="text-muted">Engine</small><br>
+                            <strong>{{ car.engine_capacity }}L</strong>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Mileage</small><br>
+                            <strong>{{ "%.1f"|format(car.mileage) if car.mileage else 'N/A' }} km</strong>
+                        </div>
+                    </div>
+                    
+                    {% if car.description %}
+                    <p class="card-text small text-muted mb-3">
+                        {{ car.description[:100] }}{% if car.description|length > 100 %}...{% endif %}
+                    </p>
+                    {% endif %}
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-success mb-0">৳{{ "%.2f"|format(car.price) }}</h6>
+                            <small class="text-muted">
+                                {% if car.available_stock > 0 %}
+                                    <span class="text-success">{{ car.available_stock }} in stock</span>
+                                {% else %}
+                                    <span class="text-danger">Out of stock</span>
+                                {% endif %}
+                            </small>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-primary btn-sm" 
+                                    onclick="viewCarDetails({{ car.car_id }})">
+                                <i class="fas fa-eye"></i> Details
+                            </button>
+                            {% if car.available_stock > 0 %}
+                            <a href="{{ url_for('customer_book_car', car_id=car.car_id) }}" 
+                               class="btn btn-primary btn-sm">
+                                <i class="fas fa-calendar-check"></i> Book
+                            </a>
+                            {% else %}
+                            <button type="button" class="btn btn-secondary btn-sm" disabled>
+                                <i class="fas fa-times"></i> Unavailable
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-car fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No cars available</h5>
+            <p class="text-muted">Check back later for new arrivals.</p>
+        </div>
+    </div>
+{% endif %}
+
+<!-- Car Details Modal -->
+<div class="modal fade" id="carDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Car Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="carDetailsContent">
+                <!-- Content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="bookCarBtn" style="display: none;">
+                    <i class="fas fa-calendar-check"></i> Book This Car
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function viewCarDetails(carId) {
+    fetch(`/api/cars/${carId}`)
+        .then(response => response.json())
+        .then(car => {
+            const modal = document.getElementById('carDetailsModal');
+            const content = document.getElementById('carDetailsContent');
+            const bookBtn = document.getElementById('bookCarBtn');
+            
+            content.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        ${car.image_url ? 
+                            `<img src="/static/${car.image_url}" class="img-fluid rounded" alt="${car.brand} ${car.model}">` :
+                            `<div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="fas fa-car fa-3x text-muted"></i>
+                            </div>`
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <h4>${car.brand} ${car.model}</h4>
+                        <p class="text-muted">${car.year} • ${car.color}</p>
+                        
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <strong>Fuel Type:</strong><br>
+                                <span class="text-muted">${car.fuel_type}</span>
+                            </div>
+                            <div class="col-6">
+                                <strong>Transmission:</strong><br>
+                                <span class="text-muted">${car.transmission}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <strong>Engine:</strong><br>
+                                <span class="text-muted">${car.engine_capacity ? car.engine_capacity + 'L' : 'N/A'}</span>
+                            </div>
+                            <div class="col-6">
+                                <strong>Mileage:</strong><br>
+                                <span class="text-muted">${car.mileage ? car.mileage.toFixed(1) + ' km' : 'N/A'}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Price:</strong><br>
+                            <span class="text-success fs-4">৳${car.price.toFixed(2)}</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Availability:</strong><br>
+                            <span class="badge ${car.available_stock > 0 ? 'bg-success' : 'bg-danger'}">
+                                ${car.available_stock > 0 ? car.available_stock + ' in stock' : 'Out of stock'}
+                            </span>
+                        </div>
+                        
+                        ${car.description ? `
+                        <div class="mb-3">
+                            <strong>Description:</strong><br>
+                            <span class="text-muted">${car.description}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            
+            if (car.available_stock > 0) {
+                bookBtn.style.display = 'inline-block';
+                bookBtn.onclick = () => {
+                    window.location.href = `/customer/book-car/${car.car_id}`;
+                };
+            } else {
+                bookBtn.style.display = 'none';
+            }
+            
+            new bootstrap.Modal(modal).show();
+        })
+        .catch(error => {
+            console.error('Error loading car details:', error);
+            alert('Error loading car details. Please try again.');
+        });
+}
+</script>
+{% endblock %} 

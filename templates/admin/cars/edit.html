@@ -1,0 +1,167 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Edit Car - Admin Panel - CARZEO{% endblock %}
+{% block page_title %}Edit Car{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Edit Car: {{ car.brand }} {{ car.model }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="brand" class="form-label">Brand *</label>
+                            <input type="text" class="form-control" id="brand" name="brand" value="{{ car.brand }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="model" class="form-label">Model *</label>
+                            <input type="text" class="form-control" id="model" name="model" value="{{ car.model }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="year" class="form-label">Year *</label>
+                            <input type="number" class="form-control" id="year" name="year" min="1900" max="2030" value="{{ car.year }}" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="color" class="form-label">Color *</label>
+                            <input type="text" class="form-control" id="color" name="color" value="{{ car.color }}" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="price" class="form-label">Price (৳) *</label>
+                            <input type="number" class="form-control" id="price" name="price" step="0.01" min="0" value="{{ car.price }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="fuel_type" class="form-label">Fuel Type *</label>
+                            <select class="form-select" id="fuel_type" name="fuel_type" required>
+                                <option value="">Select Fuel Type</option>
+                                <option value="Gasoline" {{ 'selected' if car.fuel_type == 'Gasoline' }}>Gasoline</option>
+                                <option value="Diesel" {{ 'selected' if car.fuel_type == 'Diesel' }}>Diesel</option>
+                                <option value="Electric" {{ 'selected' if car.fuel_type == 'Electric' }}>Electric</option>
+                                <option value="Hybrid" {{ 'selected' if car.fuel_type == 'Hybrid' }}>Hybrid</option>
+                                <option value="CNG" {{ 'selected' if car.fuel_type == 'CNG' }}>CNG</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="transmission" class="form-label">Transmission *</label>
+                            <select class="form-select" id="transmission" name="transmission" required>
+                                <option value="">Select Transmission</option>
+                                <option value="Automatic" {{ 'selected' if car.transmission == 'Automatic' }}>Automatic</option>
+                                <option value="Manual" {{ 'selected' if car.transmission == 'Manual' }}>Manual</option>
+                                <option value="CVT" {{ 'selected' if car.transmission == 'CVT' }}>CVT</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="engine_capacity" class="form-label">Engine Capacity (L)</label>
+                            <input type="number" class="form-control" id="engine_capacity" name="engine_capacity" step="0.1" min="0" value="{{ car.engine_capacity or '' }}">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="mileage" class="form-label">Mileage (km)</label>
+                            <input type="number" class="form-control" id="mileage" name="mileage" step="0.01" min="0" value="{{ car.mileage or '' }}">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="available_stock" class="form-label">Available Stock *</label>
+                            <input type="number" class="form-control" id="available_stock" name="available_stock" min="0" value="{{ car.available_stock }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Car Image</label>
+                        {% if car.image_url %}
+                        <div class="mb-3">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <img src="{{ url_for('static', filename=car.image_url) }}" alt="Current car image" class="img-fluid rounded" style="max-width: 100%; height: 200px; object-fit: cover;">
+                                    <br><small class="text-muted">Current image</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex flex-column h-100 justify-content-center">
+                                        <button type="button" class="btn btn-outline-danger btn-sm mb-2" onclick="removeCurrentImage()">
+                                            <i class="fas fa-trash me-1"></i>Remove Current Image
+                                        </button>
+                                        <small class="text-muted">Click to remove the current image and upload a new one</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                        <small class="text-muted">Upload a new image to replace the current one. Supported formats: JPG, PNG, GIF, WEBP (Max 16MB). Recommended size: 800x600px or larger.</small>
+                        <div class="mt-2">
+                            <div class="progress" id="uploadProgress" style="display: none;">
+                                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="4" placeholder="Enter car description...">{{ car.description or '' }}</textarea>
+                    </div>
+                    
+                    <div class="text-center">
+                        <a href="{{ url_for('admin_cars') }}" class="btn btn-secondary me-2">
+                            <i class="fas fa-arrow-left me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Update Car
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden input for removing current image -->
+<input type="hidden" id="removeImage" name="remove_image" value="false">
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function removeCurrentImage() {
+        if (confirm('Are you sure you want to remove the current image?')) {
+            document.getElementById('removeImage').value = 'true';
+            // Hide the current image preview
+            const imagePreview = document.querySelector('.col-md-6 img');
+            if (imagePreview) {
+                imagePreview.parentElement.parentElement.style.display = 'none';
+            }
+        }
+    }
+
+    // File upload preview
+    document.getElementById('image').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // Show upload progress
+            document.getElementById('uploadProgress').style.display = 'block';
+            
+            // Simulate progress (in real app, you'd use AJAX upload)
+            let progress = 0;
+            const progressBar = document.querySelector('.progress-bar');
+            const interval = setInterval(() => {
+                progress += 10;
+                progressBar.style.width = progress + '%';
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        document.getElementById('uploadProgress').style.display = 'none';
+                    }, 500);
+                }
+            }, 100);
+        }
+    });
+</script>
+{% endblock %} 

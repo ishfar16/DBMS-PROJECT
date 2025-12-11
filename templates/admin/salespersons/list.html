@@ -1,0 +1,135 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Salespersons - CARZEO{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-0">
+            <i class="fas fa-user-tie"></i> Salespersons
+        </h1>
+        <p class="text-muted">Manage sales team and performance</p>
+    </div>
+    <a href="{{ url_for('admin_add_salesperson') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add New Salesperson
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold">
+            <i class="fas fa-list"></i> All Salespersons ({{ salespersons|length }})
+        </h6>
+    </div>
+    <div class="card-body">
+        {% if salespersons %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Contact Info</th>
+                            <th>Hire Date</th>
+                            <th>Commission Rate</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for salesperson in salespersons %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-user-tie fa-2x text-primary"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="mb-0">{{ salesperson.name }}</h6>
+                                        <small class="text-muted">ID: {{ salesperson.employee_id }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <strong>{{ salesperson.contact }}</strong><br>
+                                    <small class="text-muted">{{ salesperson.email }}</small>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-info">{{ salesperson.hire_date.strftime('%Y-%m-%d') }}</span>
+                            </td>
+                            <td>
+                                <strong class="text-warning">{{ "%.2f"|format(salesperson.commission_rate) }}%</strong>
+                            </td>
+                            <td>
+                                {% if salesperson.status == 'active' %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ url_for('admin_salesperson_detail', employee_id=salesperson.employee_id) }}" 
+                                       class="btn btn-sm btn-outline-info" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('admin_edit_salesperson', employee_id=salesperson.employee_id) }}" 
+                                       class="btn btn-sm btn-outline-primary" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                            onclick="confirmDelete({{ salesperson.employee_id }}, '{{ salesperson.name }}')" 
+                                            title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-user-tie fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No salespersons found</h5>
+                <p class="text-muted">Add your first salesperson to get started</p>
+                <a href="{{ url_for('admin_add_salesperson') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Salesperson
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="salespersonName"></strong>?</p>
+                <p class="text-danger"><small>This action cannot be undone.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmDelete(employeeId, name) {
+    document.getElementById('salespersonName').textContent = name;
+    document.getElementById('deleteForm').action = `/admin/salespersons/delete/${employeeId}`;
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
+{% endblock %} 

@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Reports - CARZEO{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3 mb-0">
+            <i class="fas fa-chart-bar"></i> Reports & Analytics
+        </h1>
+        <p class="text-muted">Comprehensive reports for better decision making</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Sales Reports -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-shopping-cart"></i> Sales Reports
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <a href="{{ url_for('sales_report') }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Monthly Sales Report</h6>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        <p class="mb-1">View sales performance by month, top-selling models, and salesperson performance</p>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Revenue Analysis</h6>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        <p class="mb-1">Track revenue trends and payment method analysis</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Reports -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-car"></i> Inventory Reports
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <a href="{{ url_for('inventory_report') }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Inventory Status</h6>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        <p class="mb-1">View current inventory levels and low stock alerts</p>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Inactive Cars Report</h6>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        <p class="mb-1">Identify cars that haven't been sold or booked recently</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Customer Reports -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-users"></i> Customer Reports
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Customer Purchase History</h6>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        <p class="mb-1">View customer buying patterns and preferences</p>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Customer Segmentation</h6>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        <p class="mb-1">Analyze customers by purchase value and frequency</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Reports -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-tachometer-alt"></i> Performance Reports
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Salesperson Performance</h6>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        <p class="mb-1">Track individual salesperson performance and commissions</p>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Booking Analytics</h6>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        <p class="mb-1">Analyze test drive bookings and conversion rates</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-chart-pie"></i> Database Features Implemented
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 text-center mb-3">
+                        <div class="stats-card info">
+                            <i class="fas fa-database fa-2x mb-2"></i>
+                            <h5>6 Tables</h5>
+                            <small>Complete relational design</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <div class="stats-card success">
+                            <i class="fas fa-link fa-2x mb-2"></i>
+                            <h5>Foreign Keys</h5>
+                            <small>Data integrity maintained</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <div class="stats-card warning">
+                            <i class="fas fa-bolt fa-2x mb-2"></i>
+                            <h5>3 Triggers</h5>
+                            <small>Auto-updating functionality</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <div class="stats-card">
+                            <i class="fas fa-code fa-2x mb-2"></i>
+                            <h5>3 Procedures</h5>
+                            <small>Complex business logic</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

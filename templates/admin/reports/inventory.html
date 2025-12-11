@@ -1,0 +1,97 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Inventory Report - Admin Panel - CARZEO{% endblock %}
+{% block page_title %}Inventory Report{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-car me-2"></i>Inventory Status</h5>
+            </div>
+            <div class="card-body">
+                {% if inventory_status %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Car</th>
+                                <th>Year</th>
+                                <th>Total Cars</th>
+                                <th>Available</th>
+                                <th>Sold</th>
+                                <th>Average Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in inventory_status %}
+                            <tr>
+                                <td><strong>{{ item.brand }} {{ item.model }}</strong></td>
+                                <td>{{ item.year }}</td>
+                                <td>{{ item.total_cars }}</td>
+                                <td>
+                                    <span class="badge bg-success">{{ item.available_cars }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ item.sold_cars }}</span>
+                                </td>
+                                <td>৳{{ "%.2f"|format(item.avg_price) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-car fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No inventory data available</h5>
+                    <p class="text-muted">Inventory reports will appear here once cars are added.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if low_stock %}
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2 text-warning"></i>Low Stock Alerts</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Car</th>
+                                <th>Available Stock</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for car in low_stock %}
+                            <tr>
+                                <td>
+                                    <strong>{{ car.brand }} {{ car.model }}</strong><br>
+                                    <small class="text-muted">{{ car.year }} - {{ car.color }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-danger">{{ car.available_stock }}</span>
+                                </td>
+                                <td>৳{{ "%.2f"|format(car.price) }}</td>
+                                <td>
+                                    <span class="badge bg-warning">Low Stock</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

@@ -1,0 +1,131 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Add New Sale - Admin Panel - CARZEO{% endblock %}
+{% block page_title %}Add New Sale{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-plus me-2"></i>Add New Sale</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="car_id" class="form-label">Car *</label>
+                            <select class="form-select" id="car_id" name="car_id" required>
+                                <option value="">Select Car</option>
+                                {% for car in cars %}
+                                <option value="{{ car.car_id }}">
+                                    {{ car.brand }} {{ car.model }} ({{ car.year }}) - ৳{{ "%.2f"|format(car.price) }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="customer_id" class="form-label">Customer *</label>
+                            <select class="form-select" id="customer_id" name="customer_id" required>
+                                <option value="">Select Customer</option>
+                                {% for customer in customers %}
+                                <option value="{{ customer.customer_id }}">
+                                    {{ customer.name }} ({{ customer.email }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="salesperson_id" class="form-label">Salesperson *</label>
+                            <select class="form-select" id="salesperson_id" name="salesperson_id" required>
+                                <option value="">Select Salesperson</option>
+                                {% for salesperson in salespersons %}
+                                <option value="{{ salesperson.employee_id }}">
+                                    {{ salesperson.name }} ({{ salesperson.email }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="sale_price" class="form-label">Sale Price (৳) *</label>
+                            <input type="number" class="form-control" id="sale_price" name="sale_price" step="0.01" min="0" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="payment_method" class="form-label">Payment Method *</label>
+                            <select class="form-select" id="payment_method" name="payment_method" required>
+                                <option value="">Select Payment Method</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Bank Transfer">Bank Transfer</option>
+                                <option value="Credit Card">Credit Card</option>
+                                <option value="Debit Card">Debit Card</option>
+                                <option value="Check">Check</option>
+                                <option value="Financing">Financing</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="commission_rate" class="form-label">Commission Rate (%)</label>
+                            <input type="number" class="form-control" id="commission_rate" name="commission_rate" step="0.01" min="0" max="100" value="5.00">
+                            <small class="form-text text-muted">Default: 5%</small>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="completed" selected>Completed</option>
+                                <option value="pending">Pending</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Note:</strong> Stock will be automatically reduced by 1 when sale is recorded.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="4" placeholder="Enter any additional notes about the sale..."></textarea>
+                    </div>
+                    
+                    <div class="text-center">
+                        <a href="{{ url_for('admin_sales') }}" class="btn btn-secondary me-2">
+                            <i class="fas fa-arrow-left me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Record Sale
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Auto-populate sale price when car is selected
+    document.getElementById('car_id').addEventListener('change', function() {
+        const carSelect = this;
+        const salePriceInput = document.getElementById('sale_price');
+        
+        if (carSelect.value) {
+            const selectedOption = carSelect.options[carSelect.selectedIndex];
+            const priceText = selectedOption.text.match(/৳([\d,]+\.?\d*)/);
+            if (priceText) {
+                salePriceInput.value = priceText[1].replace(',', '');
+            }
+        }
+    });
+</script>
+{% endblock %} 

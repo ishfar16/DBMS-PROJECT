@@ -1,0 +1,125 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Add New Booking - Admin Panel - CARZEO{% endblock %}
+{% block page_title %}Add New Booking{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-plus me-2"></i>Add New Booking</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="car_id" class="form-label">Car *</label>
+                            <select class="form-select" id="car_id" name="car_id" required>
+                                <option value="">Select Car</option>
+                                {% for car in cars %}
+                                <option value="{{ car.car_id }}">
+                                    {{ car.brand }} {{ car.model }} ({{ car.year }}) - ৳{{ "%.2f"|format(car.price) }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="customer_id" class="form-label">Customer *</label>
+                            <select class="form-select" id="customer_id" name="customer_id" required>
+                                <option value="">Select Customer</option>
+                                {% for customer in customers %}
+                                <option value="{{ customer.customer_id }}">
+                                    {{ customer.name }} ({{ customer.email }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="salesperson_id" class="form-label">Salesperson</label>
+                            <select class="form-select" id="salesperson_id" name="salesperson_id">
+                                <option value="">Select Salesperson (Optional)</option>
+                                {% for salesperson in salespersons %}
+                                <option value="{{ salesperson.employee_id }}">
+                                    {{ salesperson.name }} ({{ salesperson.email }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="purpose" class="form-label">Purpose *</label>
+                            <select class="form-select" id="purpose" name="purpose" required>
+                                <option value="">Select Purpose</option>
+                                <option value="test_drive" selected>Test Drive</option>
+                                <option value="inspection">Vehicle Inspection</option>
+                                <option value="consultation">Sales Consultation</option>
+                                <option value="delivery">Vehicle Delivery</option>
+                                <option value="service">Service Appointment</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="booking_date" class="form-label">Booking Date *</label>
+                            <input type="date" class="form-control" id="booking_date" name="booking_date" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="booking_time" class="form-label">Booking Time *</label>
+                            <input type="time" class="form-control" id="booking_time" name="booking_time" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="duration_minutes" class="form-label">Duration (Minutes)</label>
+                            <input type="number" class="form-control" id="duration_minutes" name="duration_minutes" min="15" max="480" value="30">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="pending" selected>Pending</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                                <option value="no_show">No Show</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="4" placeholder="Enter any additional notes about the booking..."></textarea>
+                    </div>
+                    
+                    <div class="text-center">
+                        <a href="{{ url_for('admin_bookings') }}" class="btn btn-secondary me-2">
+                            <i class="fas fa-arrow-left me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Create Booking
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('booking_date').min = today;
+    
+    // Set default time to current time + 1 hour
+    const now = new Date();
+    now.setHours(now.getHours() + 1);
+    const timeString = now.toTimeString().slice(0, 5);
+    document.getElementById('booking_time').value = timeString;
+</script>
+{% endblock %} 

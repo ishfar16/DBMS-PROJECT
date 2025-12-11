@@ -1,0 +1,171 @@
+{% extends "customer/base.html" %}
+
+{% block title %}Book Car - CARZEO{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-0">
+            <i class="fas fa-calendar-check"></i> Book Test Drive
+        </h1>
+        <p class="text-muted">Schedule a test drive for {{ car.brand }} {{ car.model }}</p>
+    </div>
+    <a href="{{ url_for('customer_catalog') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Catalog
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-calendar"></i> Booking Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="bookingForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="booking_date" class="form-label">Preferred Date *</label>
+                            <input type="date" class="form-control" id="booking_date" name="booking_date" 
+                                   min="{{ today_date }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="booking_time" class="form-label">Preferred Time *</label>
+                            <input type="time" class="form-control" id="booking_time" name="booking_time" 
+                                   min="09:00" max="18:00" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Additional Notes</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                  placeholder="Any special requirements or preferences..."></textarea>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('customer_catalog') }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-calendar-check"></i> Book Test Drive
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Car Details Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-car"></i> Car Details
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if car.image_url %}
+                <img src="{{ url_for('static', filename=car.image_url) }}" 
+                     class="img-fluid rounded mb-3" alt="{{ car.brand }} {{ car.model }}">
+                {% else %}
+                <div class="bg-light rounded d-flex align-items-center justify-content-center mb-3" 
+                     style="height: 150px;">
+                    <i class="fas fa-car fa-3x text-muted"></i>
+                </div>
+                {% endif %}
+                
+                <h5>{{ car.brand }} {{ car.model }}</h5>
+                <p class="text-muted">{{ car.year }} • {{ car.color }}</p>
+                
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <small class="text-muted">Fuel Type</small><br>
+                        <strong>{{ car.fuel_type }}</strong>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted">Transmission</small><br>
+                        <strong>{{ car.transmission }}</strong>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <small class="text-muted">Engine</small><br>
+                        <strong>{{ car.engine_capacity }}L</strong>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted">Price</small><br>
+                        <strong class="text-success">৳{{ "%.2f"|format(car.price) }}</strong>
+                    </div>
+                </div>
+                
+                {% if car.description %}
+                <div class="mb-3">
+                    <small class="text-muted">Description</small><br>
+                    <small>{{ car.description }}</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Booking Information -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-info-circle"></i> Booking Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-clock"></i> Test Drive Duration:</h6>
+                    <p class="mb-0">30 minutes (standard)</p>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Important Notes:</h6>
+                    <ul class="mb-0 small">
+                        <li>Please arrive 10 minutes before your scheduled time</li>
+                        <li>Bring your valid driver's license</li>
+                        <li>Test drives are subject to availability</li>
+                        <li>We'll confirm your booking within 24 hours</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Set minimum date to today
+document.getElementById('booking_date').min = new Date().toISOString().split('T')[0];
+
+// Set default time to current time + 1 hour
+const now = new Date();
+now.setHours(now.getHours() + 1);
+const timeString = now.toTimeString().slice(0, 5);
+document.getElementById('booking_time').value = timeString;
+
+// Form validation
+document.getElementById('bookingForm').addEventListener('submit', function(e) {
+    const date = document.getElementById('booking_date').value;
+    const time = document.getElementById('booking_time').value;
+    
+    if (!date || !time) {
+        e.preventDefault();
+        alert('Please select both date and time for your test drive.');
+        return;
+    }
+    
+    const selectedDateTime = new Date(date + 'T' + time);
+    const now = new Date();
+    
+    if (selectedDateTime <= now) {
+        e.preventDefault();
+        alert('Please select a future date and time for your test drive.');
+        return;
+    }
+});
+</script>
+{% endblock %} 

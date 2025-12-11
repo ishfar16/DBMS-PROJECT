@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}Add New Car - CARZEO{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-0">
+            <i class="fas fa-plus"></i> Add New Car
+        </h1>
+        <p class="text-muted">Add a new vehicle to your inventory</p>
+    </div>
+    <a href="{{ url_for('cars') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Inventory
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-car"></i> Car Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="addCarForm">
+                    <div class="row">
+                        <!-- Basic Information -->
+                        <div class="col-md-6 mb-3">
+                            <label for="brand" class="form-label">Brand *</label>
+                            <input type="text" class="form-control" id="brand" name="brand" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="model" class="form-label">Model *</label>
+                            <input type="text" class="form-control" id="model" name="model" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="year" class="form-label">Year *</label>
+                            <select class="form-select" id="year" name="year" required>
+                                <option value="">Select Year</option>
+                                {% for year in range(2024, 2019, -1) %}
+                                    <option value="{{ year }}">{{ year }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="color" class="form-label">Color *</label>
+                            <input type="text" class="form-control" id="color" name="color" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="price" class="form-label">Price (৳) *</label>
+                            <input type="number" class="form-control" id="price" name="price" step="0.01" min="0" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="fuel_type" class="form-label">Fuel Type *</label>
+                            <select class="form-select" id="fuel_type" name="fuel_type" required>
+                                <option value="">Select Fuel Type</option>
+                                <option value="Petrol">Petrol</option>
+                                <option value="Diesel">Diesel</option>
+                                <option value="Electric">Electric</option>
+                                <option value="Hybrid">Hybrid</option>
+                                <option value="CNG">CNG</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="transmission" class="form-label">Transmission *</label>
+                            <select class="form-select" id="transmission" name="transmission" required>
+                                <option value="">Select Transmission</option>
+                                <option value="Manual">Manual</option>
+                                <option value="Automatic">Automatic</option>
+                                <option value="CVT">CVT</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="available_stock" class="form-label">Available Stock *</label>
+                            <input type="number" class="form-control" id="available_stock" name="available_stock" min="0" value="1" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="engine_capacity" class="form-label">Engine Capacity (L)</label>
+                            <input type="number" class="form-control" id="engine_capacity" name="engine_capacity" step="0.1" min="0">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="mileage" class="form-label">Mileage (km)</label>
+                            <input type="number" class="form-control" id="mileage" name="mileage" step="0.01" min="0">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="4" placeholder="Enter car description, features, etc."></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('cars') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Add Car
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Quick Tips -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-lightbulb"></i> Quick Tips
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success"></i>
+                        <small>Fill in all required fields marked with *</small>
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success"></i>
+                        <small>Use accurate pricing for better sales tracking</small>
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success"></i>
+                        <small>Add detailed descriptions for better customer experience</small>
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success"></i>
+                        <small>Stock will be automatically managed when sales are recorded</small>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Popular Brands -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-star"></i> Popular Brands
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <button type="button" class="btn btn-outline-primary btn-sm mb-2 w-100" onclick="setBrand('Toyota')">Toyota</button>
+                        <button type="button" class="btn btn-outline-primary btn-sm mb-2 w-100" onclick="setBrand('Honda')">Honda</button>
+                        <button type="button" class="btn btn-outline-primary btn-sm mb-2 w-100" onclick="setBrand('Ford')">Ford</button>
+                        <button type="button" class="btn btn-outline-primary btn-sm mb-2 w-100" onclick="setBrand('BMW')">BMW</button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" class="btn btn-outline-primary btn-sm mb-2 w-100" onclick="setBrand('Mercedes')">Mercedes</button>
+                        <button type="button" class="btn btn-outline-primary btn-sm mb-2 w-100" onclick="setBrand('Audi')">Audi</button>
+                        <button type="button" class="btn btn-outline-primary btn-sm mb-2 w-100" onclick="setBrand('Tesla')">Tesla</button>
+                        <button type="button" class="btn btn-outline-primary btn-sm mb-2 w-100" onclick="setBrand('Hyundai')">Hyundai</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function setBrand(brand) {
+    document.getElementById('brand').value = brand;
+}
+
+// Form validation
+document.getElementById('addCarForm').addEventListener('submit', function(e) {
+    const price = document.getElementById('price').value;
+    const stock = document.getElementById('available_stock').value;
+    
+    if (parseFloat(price) <= 0) {
+        e.preventDefault();
+        alert('Price must be greater than 0');
+        return;
+    }
+    
+    if (parseInt(stock) < 0) {
+        e.preventDefault();
+        alert('Stock cannot be negative');
+        return;
+    }
+});
+
+// Auto-format price input
+document.getElementById('price').addEventListener('input', function(e) {
+    let value = e.target.value;
+    if (value && !isNaN(value)) {
+        e.target.value = parseFloat(value).toFixed(2);
+    }
+});
+</script>
+{% endblock %} 

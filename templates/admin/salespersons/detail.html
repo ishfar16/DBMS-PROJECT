@@ -1,0 +1,321 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Salesperson Details - CARZEO{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-0">
+            <i class="fas fa-user-tie"></i> Salesperson Details
+        </h1>
+        <p class="text-muted">View salesperson information and performance</p>
+    </div>
+    <div>
+        <a href="{{ url_for('admin_edit_salesperson', employee_id=salesperson.employee_id) }}" class="btn btn-primary me-2">
+            <i class="fas fa-edit"></i> Edit
+        </a>
+        <a href="{{ url_for('admin_salespersons') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Salespersons
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Salesperson Information -->
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-user"></i> Personal Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <i class="fas fa-user-tie fa-4x text-primary mb-3"></i>
+                    <h5>{{ salesperson.name }}</h5>
+                    <p class="text-muted">Employee ID: {{ salesperson.employee_id }}</p>
+                </div>
+                
+                <div class="mb-3">
+                    <strong><i class="fas fa-phone"></i> Contact:</strong><br>
+                    <span>{{ salesperson.contact }}</span>
+                </div>
+                
+                <div class="mb-3">
+                    <strong><i class="fas fa-envelope"></i> Email:</strong><br>
+                    <span>{{ salesperson.email }}</span>
+                </div>
+                
+                <div class="mb-3">
+                    <strong><i class="fas fa-calendar"></i> Hire Date:</strong><br>
+                    <span>{{ salesperson.hire_date.strftime('%B %d, %Y') }}</span>
+                </div>
+                
+                <div class="mb-3">
+                    <strong><i class="fas fa-percentage"></i> Commission Rate:</strong><br>
+                    <span class="badge bg-warning fs-6">{{ "%.2f"|format(salesperson.commission_rate) }}%</span>
+                </div>
+                
+                <div class="mb-3">
+                    <strong><i class="fas fa-circle"></i> Status:</strong><br>
+                    {% if salesperson.status == 'active' %}
+                        <span class="badge bg-success">Active</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Inactive</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Performance Summary -->
+    <div class="col-lg-8 mb-4">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-shopping-cart fa-2x mb-2"></i>
+                        <h4>{{ sales|length }}</h4>
+                        <p class="mb-0">Total Sales</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-calendar-check fa-2x mb-2"></i>
+                        <h4>{{ bookings|length }}</h4>
+                        <p class="mb-0">Total Bookings</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-question-circle fa-2x mb-2"></i>
+                        <h4>{{ inquiries|length }}</h4>
+                        <p class="mb-0">Inquiries</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sales Summary -->
+        {% if sales %}
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-chart-line"></i> Sales Summary
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Total Revenue:</strong><br>
+                        <span class="text-success fs-5">৳{{ "%.2f"|format(sales|sum(attribute='sale_price')) }}</span>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Total Commission:</strong><br>
+                        <span class="text-warning fs-5">৳{{ "%.2f"|format(sales|sum(attribute='commission_amount') or 0) }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Sales History -->
+{% if sales %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold">
+            <i class="fas fa-shopping-cart"></i> Sales History ({{ sales|length }})
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Car</th>
+                        <th>Customer</th>
+                        <th>Sale Price</th>
+                        <th>Commission</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale in sales %}
+                    <tr>
+                        <td>
+                            <strong>{{ sale.car.brand }} {{ sale.car.model }}</strong><br>
+                            <small class="text-muted">{{ sale.car.year }} - {{ sale.car.color }}</small>
+                        </td>
+                        <td>
+                            <strong>{{ sale.customer.name }}</strong><br>
+                            <small class="text-muted">{{ sale.customer.phone }}</small>
+                        </td>
+                        <td>
+                            <strong class="text-success">৳{{ "%.2f"|format(sale.sale_price) }}</strong>
+                        </td>
+                        <td>
+                            <span class="text-warning">৳{{ "%.2f"|format(sale.commission_amount or 0) }}</span>
+                        </td>
+                        <td>
+                            {{ sale.sale_date.strftime('%Y-%m-%d') }}
+                        </td>
+                        <td>
+                            {% if sale.status == 'completed' %}
+                                <span class="badge bg-success">Completed</span>
+                            {% elif sale.status == 'pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ sale.status.title() }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Booking History -->
+{% if bookings %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold">
+            <i class="fas fa-calendar-check"></i> Booking History ({{ bookings|length }})
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Car</th>
+                        <th>Customer</th>
+                        <th>Date & Time</th>
+                        <th>Purpose</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>
+                            <strong>{{ booking.car.brand }} {{ booking.car.model }}</strong><br>
+                            <small class="text-muted">{{ booking.car.year }} - {{ booking.car.color }}</small>
+                        </td>
+                        <td>
+                            <strong>{{ booking.customer.name }}</strong><br>
+                            <small class="text-muted">{{ booking.customer.phone }}</small>
+                        </td>
+                        <td>
+                            {{ booking.booking_date.strftime('%Y-%m-%d') }}<br>
+                            <small class="text-muted">{{ booking.booking_time.strftime('%H:%M') }}</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-info">{{ booking.purpose.replace('_', ' ').title() }}</span>
+                        </td>
+                        <td>
+                            {% if booking.status == 'confirmed' %}
+                                <span class="badge bg-success">Confirmed</span>
+                            {% elif booking.status == 'pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% elif booking.status == 'completed' %}
+                                <span class="badge bg-primary">Completed</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ booking.status.title() }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Inquiry History -->
+{% if inquiries %}
+<div class="card">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold">
+            <i class="fas fa-question-circle"></i> Inquiry History ({{ inquiries|length }})
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Car</th>
+                        <th>Type</th>
+                        <th>Message</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inquiry in inquiries %}
+                    <tr>
+                        <td>
+                            {% if inquiry.customer %}
+                                <strong>{{ inquiry.customer.name }}</strong><br>
+                                <small class="text-muted">{{ inquiry.customer.phone }}</small>
+                            {% else %}
+                                <span class="text-muted">Anonymous</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if inquiry.car %}
+                                <strong>{{ inquiry.car.brand }} {{ inquiry.car.model }}</strong><br>
+                                <small class="text-muted">{{ inquiry.car.year }}</small>
+                            {% else %}
+                                <span class="text-muted">General</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-info">{{ inquiry.inquiry_type.replace('_', ' ').title() }}</span>
+                        </td>
+                        <td>
+                            <small>{{ inquiry.message[:50] }}{% if inquiry.message|length > 50 %}...{% endif %}</small>
+                        </td>
+                        <td>
+                            {% if inquiry.status == 'resolved' %}
+                                <span class="badge bg-success">Resolved</span>
+                            {% elif inquiry.status == 'in_progress' %}
+                                <span class="badge bg-warning">In Progress</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ inquiry.status.replace('_', ' ').title() }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ inquiry.created_at.strftime('%Y-%m-%d') }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if not sales and not bookings and not inquiries %}
+<div class="card">
+    <div class="card-body text-center py-4">
+        <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+        <h5 class="text-muted">No activity data available</h5>
+        <p class="text-muted">This salesperson hasn't recorded any sales, bookings, or inquiries yet.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %} 
